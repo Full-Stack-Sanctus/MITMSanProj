@@ -11,6 +11,25 @@ class AdjustBody:
     
 	
 	X = False
+	
+	U = "" 
+	
+
+class Input:
+	
+	
+	
+	if ((len(sys.argv) < 2) or (len(sys.argv) > 2)):
+		
+		url = input('Please input just one request URL: ')
+		print(url) 
+		AdjustBody.U = url
+		
+
+	else:
+		
+		AdjustBody.U = sys.argv[1]
+	
 
 
 def on_message(a, b):
@@ -21,15 +40,8 @@ def on_message(a, b):
 
 def request(flow: http.HTTPFlow) -> None:
 	
-	if ((len(sys.argv) < 2) or (len(sys.argv) > 2)):
-		
-		url = input('Please input just one request URL: ')
 	
-	else:
-		
-		url = sys.argv[1]
-	
-	if flow.request.pretty_url == url:
+	if flow.request.pretty_url == AdjustBody.U:
 		
 		AdjustBody.X = True
 		while AdjustBody.X > 0:
@@ -39,7 +51,7 @@ def request(flow: http.HTTPFlow) -> None:
 			session = device.attach(app)
 			time.sleep(1)
 			
-			with open("aes-hook.js") as f:
+			with open("aes.js") as f:
 				script = session.create_script(f.read())
 			
 			script.on("message", on_message)
@@ -52,27 +64,3 @@ def request(flow: http.HTTPFlow) -> None:
 			
 				
 				
-				
-				
-				
-				
-			
-			
-	
-	
-	
-	
-		
-		
-			
-			
-				
-				
-				
-				
-				
-				
-					
-					
-				
-			
