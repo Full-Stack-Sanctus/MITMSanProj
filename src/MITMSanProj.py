@@ -51,7 +51,7 @@ def request(flow: http.HTTPFlow) -> None:
 			session = device.attach(app)
 			time.sleep(1)
 			
-			with open("aes.js") as f:
+			with open("aes-hook.js") as f:
 				script = session.create_script(f.read())
 			
 			script.on("message", on_message)
