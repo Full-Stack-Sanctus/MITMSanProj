@@ -1,6 +1,6 @@
-// code borrowed from https://zhuanlan.zhihu.com/p/320229007
-
 'use strict;'
+
+
 
 console.log("Script loaded successfully ..... ");
 
@@ -60,58 +60,122 @@ function bytesToBase64(e) {
 
 
 
-Java.perform(function () {
-    var secretKeySpec = Java.use('javax.crypto.spec.SecretKeySpec');
-    secretKeySpec.$init.overload('[B', 'java.lang.String').implementation = function (a, b) {
-        var result = this.$init(a, b);
-        console.log("================= SecretKeySpec =====================");
-        console.log("SecretKeySpec :: bytesToString :: " + bytesToString(a));
-        console.log("SecretKeySpec :: bytesToBase64 :: " + bytesToBase64(a));
-        console.log("SecretKeySpec :: bytesToBase64 :: " + bytesToHex(a));
-        return result;
-    }
 
 
-    var ivParameterSpec = Java.use('javax.crypto.spec.IvParameterSpec');
-    ivParameterSpec.$init.overload('[B').implementation = function (a) {
-        var result = this.$init(a);
-        console.log("\n================== IvParameterSpec ====================");
-        console.log("IvParameterSpec :: bytesToString :: " + bytesToString(a));
-        console.log("IvParameterSpec :: bytesToBase64 :: " + bytesToBase64(a));
-        console.log("IvParameterSpec :: bytesToBase64 :: " + bytesToHex(a));
-        return result;
-    }
+if (Java.available) {
+  Java.perform(function() {
+  	
+  	
+  	
+  	var seckeysbytesToString;
+      var seckeysbytesToBase64;
+      var seckeysbytesToHex;
+      
+      
+      var ivkeysbytesToString;
+      var ivkeysbytesToBase64;
+      var ivkeysbytesToHex;
+      
+      
+  	      
+  	var secretKeySpec = Java.use('javax.crypto.spec.SecretKeySpec');
+  	secretKeySpec.$init.overload('[B', 'java.lang.String').implementation = function (a, b) {
+  	 	
+          
+          
+          var result = this.$init(a, b);
+          
+          seckeysbytesToString = bytesToString(a);
+          seckeysbytesToBase64 = bytesToBase64(a);
+          seckeysbytesToHex = bytesToHex(a);
+          
+              	
+      	return result;
+      	   
+       
+        } 
+  	
+  	
+      
+	
+      const ivParameterSpec = Java.use('javax.crypto.spec.IvParameterSpec');
+      ivParameterSpec.$init.overload('[B').implementation = function (a) {
+      	var result = this.$init(a);
+      
+      
+          ivkeysbytesToString = bytesToString(a);
+          ivkeysbytesToBase64 = bytesToBase64(a);
+          ivkeysbytesToHex = bytesToHex(a);
+      
+      
+          return result;
+      } 
+    
+    
+    
+      //Cipher stuff
+      
+      const Cipher = Java.use('javax.crypto.Cipher');
+      Cipher.init.overload('int', 'java.security.Key', 'java.security.spec.AlgorithmParameterSpec').implementation = function (opmode, secretkey, iv) {
+      	
+      	
+      
+      	var args = [];
+  
+  	    var details = [];
+  
+          var seckeys = [];
+          
+          var ivkeys = [];
+          
+      	
+      	var opmodeString = this.getOpmodeString(opmode);
+      
+    	  var algo = this.getAlgorithm();  
+    
+    	  args.push({'name': 'opmode', 'value': opmodeString});
+    	  args.push({'name': 'secretkeyClassName', 'value': secretkey.$className});  	
+    	  args.push({'name': 'IVclassName', 'value': iv.$className});
+    	    	  
+    	
+    	  details.push({'name': 'cipher', 'value': algo});
+    
+    
+          seckeys.push({'name': 'seckeysbytesToString', 'value': seckeysbytesToString});
+          seckeys.push({'name': 'seckeysbytesToBase64', 'value': seckeysbytesToBase64});
+          seckeys.push({'name': 'seckeysbytesToHex', 'value': seckeysbytesToHex});
+          
+          ivkeys.push({'name': 'ivkeysbytesToString', 'value': ivkeysbytesToString});
+          ivkeys.push({'name': 'ivkeysbytesToBase64', 'value': ivkeysbytesToBase64});
+          ivkeys.push({'name': 'ivkeysbytesToHex', 'value': ivkeysbytesToHex});
+    
+            
+    
+          var send_message = {
+          	'method': 'javax.crypto.Cipher.init',
+              'args': args,
+              'details': details,
+              
+              'seckeys': seckeys,
+              'ivkeys': ivkeys, 
+              
+            
+           };    
+          send(send_message);
+    
+         
+    
+    
+      	// call original init method
+          this.init.overload('int', 'java.security.Key', 'java.security.spec.AlgorithmParameterSpec').call(this, opmode, secretkey, iv);
+          
+      }  
+      
+      
+      
+      	                
+  }
+)}
+    	
 
-    var cipher = Java.use('javax.crypto.Cipher');
-    cipher.getInstance.overload('java.lang.String').implementation = function (a) {
-        var result = this.getInstance(a);
-        console.log("\n======================================");
-        console.log("Cipher :: " + a);
-        return result;
-    }
-
-    cipher.init.overload('int', 'java.security.Key', 'java.security.spec.AlgorithmParameterSpec').implementation = function (a, b, c) {
-        var result = this.init(a, b, c);
-        console.log("\n================ cipher.init() ======================");
-        
-        if (N_ENCRYPT_MODE == '1') 
-        {
-            console.log("init :: Encrypt Mode");    
-        }
-        else if(N_DECRYPT_MODE == '2')
-        {
-            console.log("init :: Decrypt Mode");    
-        }
      
-        console.log("Mode :: " + a);
-        console.log("Secret Key :: " + bytesToHex(b));
-        console.log("Secret Key :: " + bytesToBase64(b));
-        console.log("IV Param :: " + bytesToHex(c));
-        console.log("IV Param :: " + bytesToBase64(c));
-
-        return result;
-    }
-
-   
-
-});
